@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:prixz_test/book/application/search_page/search_page_cubit.dart';
+import 'package:prixz_test/book/domain/book_search_repository.dart';
 import 'package:prixz_test/book/presentation/book_search_page.dart';
 import 'package:prixz_test/user/application/user/user_registration_cubit.dart';
 
@@ -22,9 +24,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => UserCubit(getIt<UserRepository>())..requestedUser(),
-      child: const MaterialApp(
+      child: MaterialApp(
         title: 'Material App',
-        home: BookSearchPage(),
+        home: BookSearchPage(
+          cubit: SearchPageCubit(getIt<BookSearchRepository>()),
+        ),
       ),
     );
   }

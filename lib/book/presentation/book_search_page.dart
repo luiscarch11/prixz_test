@@ -4,7 +4,6 @@ import 'package:flutter_expandable/expandable.dart';
 import 'package:flutter_expandable/expander.dart';
 import 'package:prixz_test/book/domain/book.dart';
 import 'package:prixz_test/book/domain/search_option.dart';
-import 'package:prixz_test/initial_bindings.dart';
 import 'package:prixz_test/shared/presentation/color_constants.dart';
 import 'package:prixz_test/shared/presentation/rounded_button.dart';
 import 'package:prixz_test/shared/presentation/style_constants.dart';
@@ -14,18 +13,17 @@ import 'package:prixz_test/user/presentation/view_user_page.dart';
 
 import '../../user/application/user/user_registration_cubit.dart';
 import '../application/search_page/search_page_cubit.dart';
-import '../domain/book_search_repository.dart';
 part './widgets/individual_book.dart';
 
 class BookSearchPage extends StatelessWidget {
-  const BookSearchPage({Key? key}) : super(key: key);
-
+  const BookSearchPage({Key? key, required this.cubit}) : super(key: key);
+  final SearchPageCubit cubit;
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: BlocProvider(
-        create: (context) => SearchPageCubit(getIt<BookSearchRepository>()),
-        child: const CustomScrollView(
+    return BlocProvider<SearchPageCubit>(
+      create: (context) => cubit,
+      child: const Scaffold(
+        body: CustomScrollView(
           slivers: [
             _SearchWidget(),
             _BookListWidget(),

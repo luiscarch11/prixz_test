@@ -49,7 +49,7 @@ class SearchPageCubit extends Cubit<SearchPageState> {
     );
   }
 
-  void requestedSearch([SearchPageState? defaultState]) async {
+  Future<void> requestedSearch([SearchPageState? defaultState]) async {
     emit(
       (defaultState ?? state).copyWith(
         booksOrFailure: Resource.loading(),

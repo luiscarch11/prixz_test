@@ -1,13 +1,14 @@
 import 'dart:async';
 
 import 'package:dio/dio.dart';
+import 'package:equatable/equatable.dart';
 
-abstract class Resource<F, T> {
+abstract class Resource<F, T> extends Equatable {
   const Resource();
   factory Resource.none() = _ResourceNone;
-  factory Resource.loading() = _ResourceLoading;
-  factory Resource.success(T resource) = _ResourceSuccess;
-  factory Resource.failure(F failure) = _ResourceFailure;
+  factory Resource.loading() = ResourceLoading;
+  const factory Resource.success(T resource) = ResourceSuccess;
+  const factory Resource.failure(F failure) = ResourceFailure;
   static FutureOr<Resource<F, T>> fromRequest<F, T>(
     FutureOr<Resource<F, T>> Function() request, {
     FutureOr<Resource<F, T>> Function(DioError error)? onDioError,
@@ -28,19 +29,19 @@ abstract class Resource<F, T> {
   }
 
   bool get isNone => this is _ResourceNone;
-  bool get isLoading => this is _ResourceLoading;
-  bool get isSuccess => this is _ResourceSuccess;
-  bool get isFailure => this is _ResourceFailure;
+  bool get isLoading => this is ResourceLoading;
+  bool get isSuccess => this is ResourceSuccess;
+  bool get isFailure => this is ResourceFailure;
 
   void whenIsFailure(void Function(F failure) isFailure) {
-    if (this is _ResourceFailure) {
-      isFailure.call((this as _ResourceFailure).failure as F);
+    if (this is ResourceFailure) {
+      isFailure.call((this as ResourceFailure).failure as F);
     }
   }
 
   void whenIsSuccess(void Function(T resource) isSuccess) {
-    if (this is _ResourceSuccess) {
-      isSuccess.call((this as _ResourceSuccess).value as T);
+    if (this is ResourceSuccess) {
+      isSuccess.call((this as ResourceSuccess).value as T);
     }
   }
 
@@ -54,16 +55,16 @@ abstract class Resource<F, T> {
       return isNone.call();
     }
 
-    if (this is _ResourceLoading) {
+    if (this is ResourceLoading) {
       return isLoading.call();
     }
 
-    if (this is _ResourceSuccess) {
-      return isSuccess.call((this as _ResourceSuccess).value as T);
+    if (this is ResourceSuccess) {
+      return isSuccess.call((this as ResourceSuccess).value as T);
     }
 
-    if (this is _ResourceFailure) {
-      return isFailure.call((this as _ResourceFailure).failure as F);
+    if (this is ResourceFailure) {
+      return isFailure.call((this as ResourceFailure).failure as F);
     }
   }
 
@@ -77,16 +78,16 @@ abstract class Resource<F, T> {
       return isNone.call();
     }
 
-    if (this is _ResourceLoading) {
+    if (this is ResourceLoading) {
       return isLoading.call();
     }
 
-    if (this is _ResourceSuccess) {
-      return isSuccess.call((this as _ResourceSuccess).value as T);
+    if (this is ResourceSuccess) {
+      return isSuccess.call((this as ResourceSuccess).value as T);
     }
 
-    if (this is _ResourceFailure) {
-      return isFailure.call((this as _ResourceFailure).failure as F);
+    if (this is ResourceFailure) {
+      return isFailure.call((this as ResourceFailure).failure as F);
     }
 
     return isNone.call();
@@ -103,17 +104,17 @@ abstract class Resource<F, T> {
       return isNone.call();
     }
 
-    if (this is _ResourceLoading && isLoading != null) {
+    if (this is ResourceLoading && isLoading != null) {
       return isLoading.call();
     }
 
-    if (this is _ResourceSuccess && isSuccess != null) {
-      isSuccess.call((this as _ResourceSuccess).value as T);
+    if (this is ResourceSuccess && isSuccess != null) {
+      isSuccess.call((this as ResourceSuccess).value as T);
       return;
     }
 
-    if (this is _ResourceFailure && isFailure != null) {
-      return isFailure.call((this as _ResourceFailure).failure as F);
+    if (this is ResourceFailure && isFailure != null) {
+      return isFailure.call((this as ResourceFailure).failure as F);
     }
 
     orElse.call();
@@ -130,34 +131,46 @@ abstract class Resource<F, T> {
       return isNone.call();
     }
 
-    if (this is _ResourceLoading && isLoading != null) {
+    if (this is ResourceLoading && isLoading != null) {
       return isLoading.call();
     }
 
-    if (this is _ResourceSuccess && isSuccess != null) {
-      return isSuccess.call((this as _ResourceSuccess).value as T);
+    if (this is ResourceSuccess && isSuccess != null) {
+      return isSuccess.call((this as ResourceSuccess).value as T);
     }
 
-    if (this is _ResourceFailure && isFailure != null) {
-      return isFailure.call((this as _ResourceFailure).failure as F);
+    if (this is ResourceFailure && isFailure != null) {
+      return isFailure.call((this as ResourceFailure).failure as F);
     }
 
     return orElse.call();
   }
 }
 
-class _ResourceNone<F, T> extends Resource<F, T> {}
-
-class _ResourceLoading<F, T> extends Resource<F, T> {}
-
-class _ResourceSuccess<F, T> extends Resource<F, T> {
-  final T value;
-
-  _ResourceSuccess(this.value);
+class _ResourceNone<F, T> extends Resource<F, T> {
+  @override
+  List<Object?> get props => [];
 }
 
-class _ResourceFailure<F, T> extends Resource<F, T> {
+class ResourceLoading<F, T> extends Resource<F, T> {
+  @override
+  List<Object?> get props => [];
+}
+
+class ResourceSuccess<F, T> extends Resource<F, T> {
+  final T value;
+
+  const ResourceSuccess(this.value);
+
+  @override
+  List<Object?> get props => [value];
+}
+
+class ResourceFailure<F, T> extends Resource<F, T> {
   final F failure;
 
-  _ResourceFailure(this.failure);
+  const ResourceFailure(this.failure);
+
+  @override
+  List<Object?> get props => [failure];
 }
